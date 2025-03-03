@@ -36,7 +36,7 @@ export class FormController {
     return code >= 200 && code < 300;
   }
 
-  async connectBySms(formData: FormData): Promise<{ success: boolean; error?: string }> {
+  async connectBySms(formData: FormData, ipAddress: string): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await this.leadsService.connectBySms(
         formData.phone,
@@ -48,7 +48,8 @@ export class FormController {
         formData.employmentFrequency || '',
         formData.educationLevel,
         formData.annualIncome,
-        formData.propertyStatus
+        formData.propertyStatus,
+        ipAddress
       );
 
       if (this.isSuccessStatus(response.status.code) && response.spinwheelId) {
@@ -188,9 +189,8 @@ export class FormController {
     }
   }
 
-  async submitApplication(formData: FormData): Promise<{ success: boolean; error?: string; offerId?: string }> {
+  async submitApplication(formData: FormData, ipAddress: string): Promise<{ success: boolean; error?: string; offerId?: string }> {
     try {
-      const ipAddress = storageController.getUserIp() || '';
       const response = await this.leadsService.submitApplication(
         formData.email,
         formData.ssnLast4 || '',

@@ -36,7 +36,7 @@ const SKIP_FREQUENCY_STATUSES = ['not_employed', 'retired', 'other'];
 export default function MicroForm() {
   const { currentPath, navigateToRoute } = useFormRouting();
   
-  const mockDelay = 2000;
+  const mockDelay = 5000;
   const delay = async () => {
     await new Promise(resolve => setTimeout(resolve, mockDelay));
   };
@@ -211,7 +211,8 @@ export default function MicroForm() {
     setError(null);
     
     try {
-      const result = await formController.connectBySms(formData);
+      const ipAddress = storageController.getUserIp() || '';
+      const result = await formController.connectBySms(formData, ipAddress);
       
       if (result.success) {
         storageController.setApplicationSmsCode();
@@ -303,7 +304,8 @@ export default function MicroForm() {
     setError(null);
 
     try {
-      const result = await formController.connectBySms(formData);
+      const ipAddress = storageController.getUserIp() || '';
+      const result = await formController.connectBySms(formData, ipAddress);
       
       if (result.success) {
         setFormData(prev => ({ ...prev, smsCode: '' }));
@@ -353,7 +355,8 @@ export default function MicroForm() {
     setError(null);
 
     try {
-      const result = await formController.submitApplication(formData);
+      const ipAddress = storageController.getUserIp() || '';
+      const result = await formController.submitApplication(formData, ipAddress);
       
       if (result.success) {
         await handleApplicationOffers(result.offerId);
