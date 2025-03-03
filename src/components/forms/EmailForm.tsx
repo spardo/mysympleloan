@@ -6,6 +6,7 @@ import Button from '../ui/Button';
 import EmailInput from '../ui/EmailInput';
 import { useHubspot } from '../../hooks/useHubspot';
 import { clientConfig } from '../../config/clientConfig';
+import { validateEmail } from '../../utils/validation';
 
 // Marketing tracking parameters
 const MARKETING_PARAMS = {
@@ -112,11 +113,25 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
     setMarketingParams(newParams);
   }, []);
 
+  // Validate email on change
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const emailValue = e.target.value;
+    const validationError = emailValue ? validateEmail(emailValue) : null;
+    setError(validationError);
+    onChange(e);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.email) {
       setError('Please enter your email address');
+      return;
+    }
+
+    const validationError = validateEmail(formData.email);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -136,6 +151,9 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
     onSubmit({ email: formData.email });
   };
 
+  // Check if the button should be disabled
+  const isButtonDisabled = !formData.email || !!error;
+
   return (
     <form id="new-form-email" name="new-form-email" onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center">
@@ -146,7 +164,7 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
       <EmailInput
         ref={emailInputRef}
         value={formData.email}
-        onChange={onChange}
+        onChange={handleEmailChange}
         error={error}
       />
 
@@ -165,7 +183,7 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
         type="submit"
         fullWidth
         size="lg"
-        disabled={!formData.email}
+        disabled={isButtonDisabled}
       >
         Continue
       </Button>

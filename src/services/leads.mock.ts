@@ -40,7 +40,8 @@ export class MockLeadsService implements ILeadsService {
     employmentFrequency: string,
     educationLevel: string,
     annualIncome: number,
-    propertyStatus: string
+    propertyStatus: string,
+    ipAddress: string
   ): Promise<ConnectResponse> {
     await this.delay();
 

@@ -24,7 +24,8 @@ export interface ILeadsService {
     employmentFrequency: string,
     educationLevel: string,
     annualIncome: number,
-    propertyStatus: string
+    propertyStatus: string,
+    ipAddress: string
   ): Promise<ConnectResponse>;
   verifyCode(code: string, spinwheelId: string, email: string, hubspotRecordId: string): Promise<ConnectResponse>;
   createContact(spinwheelId: string, email: string, hubspotRecordId: string): Promise<CreateContactResponse>;
@@ -95,7 +96,8 @@ export class LeadsService implements ILeadsService {
     employmentFrequency: string,
     educationLevel: string,
     annualIncome: number,
-    propertyStatus: string
+    propertyStatus: string,
+    ipAddress: string
   ): Promise<ConnectResponse> {
     try {
       const response = await this.api.post('/leads/connect', {
@@ -108,7 +110,8 @@ export class LeadsService implements ILeadsService {
         employmentPayFrequency: (employmentFrequency === '') ? 'biweekly' : employmentFrequency,
         educationLevel,
         annualIncome,
-        propertyStatus
+        propertyStatus,
+        ipAddress
       });
 
       return connectResponseSchema.parse(response.data);
