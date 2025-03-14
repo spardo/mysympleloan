@@ -25,7 +25,8 @@ export interface ILeadsService {
     educationLevel: string,
     annualIncome: number,
     propertyStatus: string,
-    ipAddress: string
+    ipAddress: string,
+    marketingParams: Record<string, string>
   ): Promise<ConnectResponse>;
   verifyCode(code: string, spinwheelId: string, email: string, hubspotRecordId: string): Promise<ConnectResponse>;
   createContact(spinwheelId: string, email: string, hubspotRecordId: string): Promise<CreateContactResponse>;
@@ -97,7 +98,8 @@ export class LeadsService implements ILeadsService {
     educationLevel: string,
     annualIncome: number,
     propertyStatus: string,
-    ipAddress: string
+    ipAddress: string,
+    marketingParams: Record<string, string>
   ): Promise<ConnectResponse> {
     try {
       const response = await this.api.post('/leads/connect', {
@@ -111,7 +113,8 @@ export class LeadsService implements ILeadsService {
         educationLevel,
         annualIncome,
         propertyStatus,
-        ipAddress
+        ipAddress,
+        marketingParams
       });
 
       return connectResponseSchema.parse(response.data);

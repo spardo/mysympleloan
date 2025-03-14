@@ -5,7 +5,7 @@ import { storageController } from './StorageController';
 
 export type ContactResult = {
   success: boolean;
-  status?: 'QUALIFIED' | 'UNQUALIFIED' | 'ERROR';
+  status?: 'accepted' | 'rejected' | 'ERROR';
   error?: string;
 };
 
@@ -14,9 +14,14 @@ export class FormController {
   private spinwheelId: string = '';
   private hubspotRecordId: string = '';
   private verificationAttempts: number = 0;
+  private contactFirstName: string = '';
 
   constructor() {
     this.leadsService = createLeadsService();
+  }
+
+  public getContactFirstName(): string {
+    return this.contactFirstName;
   }
 
   private handleApiError(err: unknown): { success: false; error: string } {
@@ -36,7 +41,7 @@ export class FormController {
     return code >= 200 && code < 300;
   }
 
-  async connectBySms(formData: FormData, ipAddress: string): Promise<{ success: boolean; error?: string }> {
+  async connectBySms(formData: FormData, ipAddress: string, marketingParams: Record<string, string>): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await this.leadsService.connectBySms(
         formData.phone,
@@ -49,7 +54,8 @@ export class FormController {
         formData.educationLevel,
         formData.annualIncome,
         formData.propertyStatus,
-        ipAddress
+        ipAddress,
+        marketingParams
       );
 
       if (this.isSuccessStatus(response.status.code) && response.spinwheelId) {
@@ -113,6 +119,11 @@ export class FormController {
       // Track verification attempts
       this.verificationAttempts++;
 
+      // Store the first name from the response
+      if (response.firstName) {
+        this.contactFirstName = response.firstName;
+      }
+
       // Handle qualified status
       if (response.state === 'accepted') {
         return {
@@ -136,7 +147,7 @@ export class FormController {
         error: response.status.message || 'Failed to create contact'
       };
     } catch (err) {
-      if (err.status && err.status.code === 422) {
+      if (err instanceof ApiError && err.status.code === 422) {
         return {
           success: true,
           status: 'rejected'

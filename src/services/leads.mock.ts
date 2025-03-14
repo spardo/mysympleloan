@@ -41,7 +41,8 @@ export class MockLeadsService implements ILeadsService {
     educationLevel: string,
     annualIncome: number,
     propertyStatus: string,
-    ipAddress: string
+    ipAddress: string,
+    marketingParams: Record<string, string>
   ): Promise<ConnectResponse> {
     await this.delay();
 

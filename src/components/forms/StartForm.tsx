@@ -29,7 +29,7 @@ export default function StartForm({ onSubmit }: StartFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="text-center">
-        <Title className="mb-2">Prequalify for a Personal Loan in minutes</Title>
+        <Title className="mb-2">Get your Personal Loan in minutes</Title>
         <Description size="lg" className="mb-4">
           Check your rate with no impact to your credit score
         </Description>

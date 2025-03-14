@@ -64,9 +64,10 @@ type EmailFormProps = {
   formData: FormData;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (data: Partial<FormData>) => void;
+  onMarketingParams: (params: Record<string, string>) => void;
 };
 
-export default function EmailForm({ formData, onChange, onSubmit }: EmailFormProps) {
+export default function EmailForm({ formData, onChange, onSubmit, onMarketingParams }: EmailFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [marketingParams, setMarketingParams] = useState<MarketingParams>(MARKETING_PARAMS);
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -111,6 +112,7 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
     newParams.platform = navigator.platform;
 
     setMarketingParams(newParams);
+    onMarketingParams(newParams);
   }, []);
 
   // Validate email on change
@@ -121,7 +123,7 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
     onChange(e);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.email) {
@@ -135,20 +137,26 @@ export default function EmailForm({ formData, onChange, onSubmit }: EmailFormPro
       return;
     }
 
-    // Track email submission in HubSpot
-    hubspot.identify({
-      email: formData.email,
-      ...marketingParams
-    });
+    try {
+      // Track email submission in HubSpot analytics
+      hubspot.identify({
+        email: formData.email,
+        ...marketingParams
+      });
 
-    // Track form step completion
-    hubspot.trackEvent('email_step_completed', {
-      email: formData.email,
-      form_step: 'email',
-      ...marketingParams
-    });
+      // Track form step completion
+      hubspot.trackEvent('email_step_completed', {
+        email: formData.email,
+        form_step: 'email',
+        ...marketingParams
+      });
 
-    onSubmit({ email: formData.email });
+      onSubmit({ email: formData.email });
+    } catch (err) {
+      console.error('Failed to submit HubSpot form:', err);
+      // Continue with form submission even if HubSpot form fails
+      onSubmit({ email: formData.email });
+    }
   };
 
   // Check if the button should be disabled

@@ -61,7 +61,7 @@ export default function BirthDateForm({ formData, onSubmit }: BirthDateFormProps
     <form id="new-form-date" onSubmit={handleContinue} className="space-y-6">
       <div className="text-center">
         <Title as="h2" className="mb-2">When were you born?</Title>
-        <Description size="lg">You must be at least 18 years old to apply</Description>
+        <Description size="lg">Enter your birthdate to confirm eligibility (must be 18+)</Description>
       </div>
 
       <DatePicker

@@ -35,6 +35,33 @@ export class StorageController {
     sessionStorage.removeItem('formData');
   }
 
+  // Contact First Name (Session Storage)
+  public getContactFirstName(): string | null {
+    return sessionStorage.getItem('contactFirstName');
+  }
+
+  public setContactFirstName(firstName: string): void {
+    sessionStorage.setItem('contactFirstName', firstName);
+  }
+
+  public clearContactFirstName(): void {
+    sessionStorage.removeItem('contactFirstName');
+  }
+
+  // Scheduled Time (Session Storage)
+  public getScheduledTime(): Date | null {
+    const time = sessionStorage.getItem('scheduledTime');
+    return time ? new Date(time) : null;
+  }
+
+  public setScheduledTime(time: Date): void {
+    sessionStorage.setItem('scheduledTime', time.toISOString());
+  }
+
+  public clearScheduledTime(): void {
+    sessionStorage.removeItem('scheduledTime');
+  }
+
   // Application Data (Local Storage)
   public getApplicationData(): ApplicationData | null {
     const data = localStorage.getItem('applicationData');
@@ -138,6 +165,8 @@ export class StorageController {
     // Clear session storage
     this.clearFormData();
     this.clearUserIp();
+    this.clearContactFirstName();
+    this.clearScheduledTime();
 
     // Clear local storage
     this.clearApplicationData();

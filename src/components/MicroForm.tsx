@@ -77,6 +77,7 @@ export default function MicroForm() {
   const [contactAttempts, setContactAttempts] = useState(0);
   const [verificationAttempts, setVerificationAttempts] = useState(0);
   const [showManualVerification, setShowManualVerification] = useState(false);
+  const [marketingParams, setMarketingParams] = useState<Record<string, string>>({});
 
   const currentStep = routeManager.getCurrentStep(currentPath);
 
@@ -104,6 +105,11 @@ export default function MicroForm() {
   }, [currentPath, navigateToRoute]);
   
   const handleApplicationSuccess = () => {
+    // Store the first name from the contact response
+    if (formController.getContactFirstName()) {
+      storageController.setContactFirstName(formController.getContactFirstName());
+    }
+
     storageController.setApplicationData({
       timestamp: Date.now(),
       email: formData.email,
@@ -141,10 +147,7 @@ export default function MicroForm() {
     
     await delay();
     
-    // Redirect to HubSpot offers page
-    const params = new URLSearchParams(window.location.search);
-    params.set("id", offerId);
-    const targetUrl = `${clientConfig.hubspotUrl}/offers?${params.toString()}`;
+    const targetUrl = `https://fiona.com/partner/symple-lending-loans/loans?results=${offerId}&step=results`;
     window.location.href = targetUrl;
   };
 
@@ -212,7 +215,7 @@ export default function MicroForm() {
     
     try {
       const ipAddress = storageController.getUserIp() || '';
-      const result = await formController.connectBySms(formData, ipAddress);
+      const result = await formController.connectBySms(formData, ipAddress, marketingParams);
       
       if (result.success) {
         storageController.setApplicationSmsCode();
@@ -305,7 +308,7 @@ export default function MicroForm() {
 
     try {
       const ipAddress = storageController.getUserIp() || '';
-      const result = await formController.connectBySms(formData, ipAddress);
+      const result = await formController.connectBySms(formData, ipAddress, marketingParams);
       
       if (result.success) {
         setFormData(prev => ({ ...prev, smsCode: '' }));
@@ -377,6 +380,10 @@ export default function MicroForm() {
     if (prevRoute) {
       navigateToRoute(prevRoute);
     }
+  };
+
+  const handleMarketingParams = (params: Record<string, string>) => {
+    setMarketingParams(params);
   };
 
   return (
@@ -453,6 +460,7 @@ export default function MicroForm() {
               formData={formData}
               onChange={handleChange}
               onSubmit={handleFormStep}
+              onMarketingParams={handleMarketingParams}
             />
           )}
 

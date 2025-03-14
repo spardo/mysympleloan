@@ -1,22 +1,70 @@
-import React from 'react';
-import { CheckCircle, Phone } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle, Phone, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import { storageController } from '../../controllers/StorageController';
 import { FormRouteEnum } from '../../routes/FormRoutes';
 import { useFormRouting } from '../../routes/FormRoutes';
 import Title from '../ui/Title';
 import Description from '../ui/Description';
 import Button from '../ui/Button';
+import ScheduleCallForm from './ScheduleCallForm';
+import { isBusinessHours } from '../../utils/businessHours';
+import { getBrowserTimezone } from '../../utils/timezones';
+import ErrorMessage from '../ui/ErrorMessage';
 
 export default function SuccessStep() {
   const { navigateToRoute } = useFormRouting();
   const phoneNumber = '(855) 303-1455';
   const phoneNumberLink = 'tel:8553031455';
+  const firstName = storageController.getContactFirstName() || '';
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [scheduledTime, setScheduledTime] = useState<Date | null>(storageController.getScheduledTime());
 
   // Redirect if not successful
   if (!storageController.isApplicationSuccessful()) {
     navigateToRoute(FormRouteEnum.START);
     return null;
+  }
+
+  const handleScheduleCall = async (selectedTime: Date) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Store the scheduled time
+      storageController.setScheduledTime(selectedTime);
+      setScheduledTime(selectedTime);
+    } catch (error) {
+      console.error('Failed to schedule call:', error);
+      setError('Unable to schedule your call. Please try again or call us directly.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatAppointmentTime = (date: Date): string => {
+    const timezone = getBrowserTimezone();
+    const zonedDate = utcToZonedTime(date, timezone);
+    return format(zonedDate, "EEEE, MMMM d 'at' h:mm a");
+  };
+
+  if (!isBusinessHours() && !scheduledTime) {
+    return (
+      <>
+        <ScheduleCallForm 
+          firstName={firstName} 
+          onSchedule={handleScheduleCall} 
+        />
+        {error && (
+          <ErrorMessage 
+            message={error}
+            className="mt-4"
+          />
+        )}
+      </>
+    );
   }
 
   return (
@@ -26,17 +74,44 @@ export default function SuccessStep() {
           <CheckCircle className="w-8 h-8 text-[#b3905e]" />
         </div>
         
-        <Title as="h2" className="mb-2">Application Received!</Title>
-        <Description>
-          Thank you for your submission. We'll be in touch with you shortly with next steps.
+        <Title as="h2" className="mb-2">
+          {scheduledTime ? (
+            'Application Received!'
+          ) : (
+            'Congratulations!'
+          )}
+        </Title>
+        <Description size="lg">
+          {scheduledTime ? (
+            <span>
+              Thank you <span className="font-medium">{firstName}</span>, we look forward to speaking with you on{' '}
+              <span className="font-medium">{formatAppointmentTime(scheduledTime)}</span>
+            </span>
+          ) : (
+            <span>
+              Thank you {firstName}, we have a question for you.
+            </span>
+          )}
         </Description>
       </div>
       
       <div className="w-full md:w-1/2 mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-          <Description className="text-center">
-            For immediate assistance, call us at
-          </Description>
+          {scheduledTime ? (
+            <>
+              <div className="flex items-center justify-center gap-2 text-[#b3905e]">
+                <Calendar className="w-5 h-5" />
+                <span className="font-medium">Appointment Scheduled</span>
+              </div>
+              <Description className="text-center">
+                <span>For immediate assistance before your appointment, call:</span>
+              </Description>
+            </>
+          ) : (
+            <Description className="text-center">
+              <span>Call us at:</span>
+            </Description>
+          )}
           
           <Button
             as="a"
@@ -50,10 +125,6 @@ export default function SuccessStep() {
           </Button>
         </div>
       </div>
-
-      <Description size="sm" className="text-center">
-        Our team is available Monday through Friday, 5 AM to 7 PM PST and on Saturday from 8 AM to 4 PM PST.
-      </Description>
     </div>
   );
 }

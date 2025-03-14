@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Calendar, BanknoteIcon, Briefcase, GraduationCap, Home, RefreshCcw, ExternalLink, Phone } from 'lucide-react';
+import { AlertTriangle, Calendar, BanknoteIcon, Briefcase, GraduationCap, Home, RefreshCcw, ExternalLink, Phone, Clock } from 'lucide-react';
 import { storageController } from '../../controllers/StorageController';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../Logo';
@@ -8,6 +8,11 @@ import Description from '../ui/Description';
 import ActionLink from '../ui/ActionLink';
 import Button from '../ui/Button';
 import ErrorMessage from '../ui/ErrorMessage';
+import ScheduleCallForm from './ScheduleCallForm';
+import { isBusinessHours } from '../../utils/businessHours';
+import { format } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
+import { getBrowserTimezone } from '../../utils/timezones';
 
 const phoneNumber = '(855) 303-1455';
 const phoneNumberLink = 'tel:8553031455';
@@ -73,9 +78,12 @@ const getEducationLevel = (value: string) => {
 
 export default function ApplicationBlocked() {
   const [showWarning, setShowWarning] = useState(false);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
   const applicationData = storageController.getApplicationData();
   const daysRemaining = storageController.getBlockTimeRemaining();
   const isSuccessful = storageController.isApplicationSuccessful();
+  const firstName = storageController.getContactFirstName() || '';
+  const scheduledTime = storageController.getScheduledTime();
   const navigate = useNavigate();
   
   const expirationDate = applicationData ? new Date(applicationData.timestamp + (30 * 24 * 60 * 60 * 1000)).toLocaleDateString('en-US', {
@@ -83,6 +91,12 @@ export default function ApplicationBlocked() {
     day: 'numeric',
     year: 'numeric'
   }) : '';
+
+  const formatAppointmentTime = (date: Date): string => {
+    const timezone = getBrowserTimezone();
+    const zonedDate = utcToZonedTime(date, timezone);
+    return format(zonedDate, "EEEE, MMMM d 'at' h:mm a");
+  };
 
   const handleClearStorage = () => {
     if (showWarning) {
@@ -92,6 +106,15 @@ export default function ApplicationBlocked() {
       setShowWarning(true);
     }
   };
+
+  const handleScheduleCall = (selectedTime: Date) => {
+    storageController.setScheduledTime(selectedTime);
+    setShowScheduleForm(false);
+  };
+
+  if (showScheduleForm) {
+    return <ScheduleCallForm firstName={firstName} onSchedule={handleScheduleCall} />;
+  }
 
   if (applicationData?.status === 'unsuccessful') {
     return (
@@ -140,20 +163,66 @@ export default function ApplicationBlocked() {
       {isSuccessful && (
         <div className="w-full md:w-1/2 mx-auto">
           <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-            <Description className="text-center">
-              For immediate assistance, call us at
-            </Description>
+            {scheduledTime ? (
+              <>
+                <div className="flex items-center justify-center gap-2 text-[#b3905e]">
+                  <Calendar className="w-5 h-5" />
+                  <span className="font-medium">Appointment Scheduled</span>
+                </div>
+                <Description className="text-center">
+                  Your callback is scheduled for:
+                  <div className="font-medium mt-1">{formatAppointmentTime(scheduledTime)}</div>
+                </Description>
+                <Description className="text-center">
+                  For immediate assistance before your appointment, call:
+                </Description>
+              </>
+            ) : (
+              <Description className="text-center">
+                {isBusinessHours() ? (
+                  'For immediate assistance, call us at'
+                ) : (
+                  'Our team is currently offline. You can:'
+                )}
+              </Description>
+            )}
             
-            <Button
-              as="a"
-              href={phoneNumberLink}
-              variant="primary"
-              size="lg"
-              fullWidth
-              icon={<Phone className="w-5 h-5" />}
-            >
-              {phoneNumber}
-            </Button>
+            <div className="space-y-3">
+              {!scheduledTime && !isBusinessHours() ? (
+                <>
+                  <Button
+                    onClick={() => setShowScheduleForm(true)}
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                    icon={<Clock className="w-5 h-5" />}
+                  >
+                    Schedule a Call
+                  </Button>
+                  <Button
+                    as="a"
+                    href={phoneNumberLink}
+                    variant="outline"
+                    size="lg"
+                    fullWidth
+                    icon={<Phone className="w-5 h-5" />}
+                  >
+                    {phoneNumber}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  as="a"
+                  href={phoneNumberLink}
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  icon={<Phone className="w-5 h-5" />}
+                >
+                  {phoneNumber}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -269,7 +338,6 @@ export default function ApplicationBlocked() {
           </ActionLink>
         </div>
       )}
-
     </div>
   );
 }

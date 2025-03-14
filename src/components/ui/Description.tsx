@@ -19,8 +19,8 @@ export default function Description({
   };
 
   return (
-    <p className={`${baseStyles} ${sizes[size]} ${className}`}>
+    <div className={`${baseStyles} ${sizes[size]} ${className}`}>
       {children}
-    </p>
+    </div>
   );
 }
