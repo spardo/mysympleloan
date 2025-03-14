@@ -49,7 +49,7 @@ export default function MicroForm() {
       email: '',
       phone: '',
       birthDate: '',
-      smsConsent: false,
+      smsConsent: true,
       promoSmsConsent: false,
       smsCode: '',
       ssnLast4: '',

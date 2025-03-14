@@ -60,7 +60,7 @@ export default function BirthDateForm({ formData, onSubmit }: BirthDateFormProps
   return (
     <form id="new-form-date" onSubmit={handleContinue} className="space-y-6">
       <div className="text-center">
-        <Title as="h2" className="mb-2">When were you born?</Title>
+        <Title as="h2" className="mb-2">What's your date of birth?</Title>
         <Description size="lg">Enter your birthdate to confirm eligibility (must be 18+)</Description>
       </div>
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Plus, Minus } from 'lucide-react';
 import type { FormData } from '../../types/form';
 import Title from '../ui/Title';
 import Description from '../ui/Description';
@@ -36,6 +37,16 @@ export default function AnnualIncomeForm({ formData, onSubmit }: AnnualIncomeFor
     onSubmit({ annualIncome: income });
   };
 
+  const handleIncrement = () => {
+    const newValue = Math.min(income + step, maxIncome);
+    handleSliderChange(newValue);
+  };
+
+  const handleDecrement = () => {
+    const newValue = Math.max(income - step, minIncome);
+    handleSliderChange(newValue);
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -44,12 +55,32 @@ export default function AnnualIncomeForm({ formData, onSubmit }: AnnualIncomeFor
       </div>
 
       <div className="space-y-6">
-        <SliderValue
-          value={income}
-          min={minIncome}
-          max={maxIncome}
-          formatValue={formatCurrency}
-        />
+        <div className="flex items-center justify-between gap-4">
+          <button
+            type="button"
+            onClick={handleDecrement}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+            aria-label="Decrease income"
+          >
+            <Minus className="w-5 h-5 text-gray-600" />
+          </button>
+          
+          <SliderValue
+            value={income}
+            min={minIncome}
+            max={maxIncome}
+            formatValue={formatCurrency}
+          />
+          
+          <button
+            type="button"
+            onClick={handleIncrement}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+            aria-label="Increase income"
+          >
+            <Plus className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
 
         <Slider
           value={income}

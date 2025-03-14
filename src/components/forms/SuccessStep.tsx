@@ -13,6 +13,7 @@ import ScheduleCallForm from './ScheduleCallForm';
 import { isBusinessHours } from '../../utils/businessHours';
 import { getBrowserTimezone } from '../../utils/timezones';
 import ErrorMessage from '../ui/ErrorMessage';
+import ApplicationProgress from '../ApplicationProgress';
 
 export default function SuccessStep() {
   const { navigateToRoute } = useFormRouting();
@@ -22,6 +23,8 @@ export default function SuccessStep() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [scheduledTime, setScheduledTime] = useState<Date | null>(storageController.getScheduledTime());
+
+  const enableScheduler = false;
 
   // Redirect if not successful
   if (!storageController.isApplicationSuccessful()) {
@@ -50,7 +53,7 @@ export default function SuccessStep() {
     return format(zonedDate, "EEEE, MMMM d 'at' h:mm a");
   };
 
-  if (!isBusinessHours() && !scheduledTime) {
+  if (!isBusinessHours() && !scheduledTime && enableScheduler) {
     return (
       <>
         <ScheduleCallForm 
@@ -78,7 +81,7 @@ export default function SuccessStep() {
           {scheduledTime ? (
             'Application Received!'
           ) : (
-            'Congratulations!'
+            `Congratulations, ${firstName}!`
           )}
         </Title>
         <Description size="lg">
@@ -89,11 +92,13 @@ export default function SuccessStep() {
             </span>
           ) : (
             <span>
-              Thank you {firstName}, we have a question for you.
+              We have a question about your application.
             </span>
           )}
         </Description>
       </div>
+
+      <ApplicationProgress />
       
       <div className="w-full md:w-1/2 mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
@@ -109,7 +114,7 @@ export default function SuccessStep() {
             </>
           ) : (
             <Description className="text-center">
-              <span>Call us at:</span>
+              <span>Please call us at:</span>
             </Description>
           )}
           

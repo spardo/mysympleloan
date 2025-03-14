@@ -7,3 +7,9 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+interface Window {
+  dataLayer: any[];
+  google_tag_manager?: any;
+  _hsq: any[];
+}

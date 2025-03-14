@@ -44,28 +44,6 @@ export default function ContactInfoForm({
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({
-      ...e,
-      target: {
-        ...e.target,
-        name: 'smsConsent',
-        value: e.target.checked.toString()
-      }
-    });
-  };
-
-  const handlePromoCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({
-      ...e,
-      target: {
-        ...e.target,
-        name: 'promoSmsConsent',
-        value: e.target.checked.toString()
-      }
-    });
-  };
-
   const isFormValid = () => {
     return (
       formData.phone &&
@@ -77,7 +55,7 @@ export default function ContactInfoForm({
   return (
     <form id="new-form-phone" onSubmit={onSubmit} className="space-y-6">
       <div className="text-center">
-        <Title as="h2" className="mb-2">Finally, Verify Your Phone</Title>
+        <Title as="h2" className="mb-2">Enter Your Phone Number</Title>
         <Description size="lg">To ensure it is really you, we'll text a one-time passcode to your mobile phone.</Description>
       </div>
 
@@ -90,25 +68,7 @@ export default function ContactInfoForm({
           label="Mobile Phone"
           required
         />
-
-        <ConsentCheckbox
-          name="LEGAL_CONSENT.subscription_type_283760521"
-          id="LEGAL_CONSENT.subscription_type_283760521-387e98ab-c7d6-4730-bf86-38cda34d7642"
-          checked={formData.smsConsent || false}
-          onChange={handleCheckboxChange}
-          required={true}
-        >
-          I agree to receive SMS messages from Symple Lending regarding application updates and account-related communications.
-        </ConsentCheckbox>
-
-        <ConsentCheckbox
-          name="promoSmsConsent"
-          id="promoSmsConsent"
-          checked={formData.promoSmsConsent || false}
-          onChange={handlePromoCheckboxChange}
-        >
-          (Optional) I agree to receive SMS messages from Symple Lending regarding product updates and related promotional offers. Message and data rates may apply. Message frequency varies. Reply HELP for assistance or STOP to cancel.
-        </ConsentCheckbox>
+        
       </div>
 
       {error && (
@@ -126,21 +86,27 @@ export default function ContactInfoForm({
         fullWidth
         size="lg"
       >
-        Send Verification Code
+        Continue
       </Button>
 
       <Disclaimer>
-        By continuing, you provide Symple Lending and Spinwheel Solutions, Inc. express written consent to obtain your credit report for application purposes. You agree to Symple Lending's{' '}
+        <p className="mb-4">
+        By continuing, you agree to recieve SMS messages from Symple Lending regarding application updates and account-related communication.  Message and data rates may apply. Message frequency varies. Reply HELP for assistance or STOP to cancel.  </p>
+        
+        <p>By continuing, you also provide Symple Lending and Spinwheel Solutions, Inc. express written consent to obtain your credit report for application purposes. You agree to Symple Lending's{' '}
         <a href="https://symplelending.com/terms-of-use" target="_blank" rel="noopener noreferrer">
           Terms of Service
         </a>,{' '}
         <a href="https://symplelending.com/privacy-policy" target="_blank" rel="noopener noreferrer">
           Privacy Policy
         </a>,{' '}
+        <a href="https://symplelending.com/esign-consent" target="_blank" rel="noopener noreferrer">
+          eSign Consent
+        </a>,{' '}
         <a href="https://legal.spinwheel.io/end-user-agreement/" target="_blank" rel="noopener noreferrer">
           Spinwheel End User Agreement
         </a>{' '}
-        and authorize Spinwheel Solutions, Inc. to retrieve your credit profile from any consumer reporting agency.
+        and authorize Spinwheel Solutions, Inc. to retrieve your credit profile from any consumer reporting agency.</p>
       </Disclaimer>
     </form>
   );

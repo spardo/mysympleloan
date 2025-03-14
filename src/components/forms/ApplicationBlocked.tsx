@@ -16,6 +16,7 @@ import { getBrowserTimezone } from '../../utils/timezones';
 
 const phoneNumber = '(855) 303-1455';
 const phoneNumberLink = 'tel:8553031455';
+const enableScheduler = false;
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -112,7 +113,7 @@ export default function ApplicationBlocked() {
     setShowScheduleForm(false);
   };
 
-  if (showScheduleForm) {
+  if (showScheduleForm && enableScheduler) {
     return <ScheduleCallForm firstName={firstName} onSchedule={handleScheduleCall} />;
   }
 
@@ -153,11 +154,6 @@ export default function ApplicationBlocked() {
 
       <div>
         <Title as="h2" className="mb-2">Application Already Submitted</Title>
-        <Description>
-          You've already submitted a loan application with the email address{' '}
-          <span className="font-medium">{applicationData?.email}</span>. 
-          Please wait {daysRemaining} days before submitting a new application.
-        </Description>
       </div>
 
       {isSuccessful && (
@@ -179,7 +175,7 @@ export default function ApplicationBlocked() {
               </>
             ) : (
               <Description className="text-center">
-                {isBusinessHours() ? (
+                {isBusinessHours() || !enableScheduler ? (
                   'For immediate assistance, call us at'
                 ) : (
                   'Our team is currently offline. You can:'
@@ -188,7 +184,7 @@ export default function ApplicationBlocked() {
             )}
             
             <div className="space-y-3">
-              {!scheduledTime && !isBusinessHours() ? (
+              {!scheduledTime && !isBusinessHours() && enableScheduler ? (
                 <>
                   <Button
                     onClick={() => setShowScheduleForm(true)}

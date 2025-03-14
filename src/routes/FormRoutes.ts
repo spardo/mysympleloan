@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { gtm } from '../utils/gtm';
 
 export const FormRouteEnum = {
   START: 'start',
@@ -69,6 +70,10 @@ export function useFormRouting() {
     // Update page title
     const pageTitle = PAGE_TITLES[route];
     document.title = `Symple Lending - ${pageTitle}`;
+
+    // Track step progression in GTM
+    gtm.trackStepProgress(route);
+
     navigate(`/${route}`);
   };
 

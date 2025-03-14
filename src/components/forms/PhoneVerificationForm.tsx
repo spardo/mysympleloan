@@ -7,6 +7,7 @@ import Description from '../ui/Description';
 import Button from '../ui/Button';
 import ErrorMessage from '../ui/ErrorMessage';
 import ActionLink from '../ui/ActionLink';
+import ConsentCheckbox from '../ui/ConsentCheckbox';
 import { storageController } from '../../controllers/StorageController';
 import { useHubspot } from '../../hooks/useHubspot';
 
@@ -102,6 +103,17 @@ export default function PhoneVerificationForm({
     onManualVerification();
   };
 
+  const handlePromoCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange({
+      ...e,
+      target: {
+        ...e.target,
+        name: 'promoSmsConsent',
+        value: e.target.checked.toString()
+      }
+    });
+  };
+
   const isValidCode = (code: string) => {
     return /^\d{6}$/.test(code);
   };
@@ -119,21 +131,8 @@ export default function PhoneVerificationForm({
     <>
       <form id="new-form-sms" onSubmit={handleSubmit} className="space-y-6">
         <div className="text-center">
-          <Title as="h2" className="mb-2">Verify Your Phone</Title>
-          <Description size="lg">Enter the 6-digit code sent to your phone</Description>
-        </div>
-  
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Mobile Phone:</span>
-              <span className="font-medium text-gray-900">{formData.phone}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Birth Date:</span>
-              <span className="font-medium text-gray-900">{formatDate(formData.birthDate)}</span>
-            </div>
-          </div>
+          <Title as="h2" className="mb-2">Check Your Phone</Title>
+          <Description size="lg">Enter the 6-digit code below</Description>
         </div>
   
         <div>
@@ -152,6 +151,28 @@ export default function PhoneVerificationForm({
           />
         </div>
   
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Mobile Phone:</span>
+              <span className="font-medium text-gray-900">{formData.phone}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Birth Date:</span>
+              <span className="font-medium text-gray-900">{formatDate(formData.birthDate)}</span>
+            </div>
+          </div>
+        </div>
+
+        <ConsentCheckbox
+          name="promoSmsConsent"
+          id="promoSmsConsent"
+          checked={formData.promoSmsConsent || false}
+          onChange={handlePromoCheckboxChange}
+        >
+          (Optional) I agree to receive SMS messages from Symple Lending regarding product updates and related promotional offers. Message and data rates may apply. Message frequency varies. Reply HELP for assistance or STOP to cancel.
+        </ConsentCheckbox>
+  
         <ErrorMessage message={error} />
   
         <Button
@@ -162,9 +183,8 @@ export default function PhoneVerificationForm({
           fullWidth
           size="lg"
         >
-          Verify
+          Get My Results
         </Button>
-  
       </form>
       
       {verificationAttempts >= 2 && (
