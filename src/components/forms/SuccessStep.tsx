@@ -97,8 +97,6 @@ export default function SuccessStep() {
           )}
         </Description>
       </div>
-
-      <ApplicationProgress />
       
       <div className="w-full md:w-1/2 mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 space-y-4">

@@ -56,7 +56,6 @@ export default function ContactInfoForm({
     <form id="new-form-phone" onSubmit={onSubmit} className="space-y-6">
       <div className="text-center">
         <Title as="h2" className="mb-2">Enter Your Phone Number</Title>
-        <Description size="lg">To ensure it is really you, we'll text a one-time passcode to your mobile phone.</Description>
       </div>
 
       <div className="space-y-4">

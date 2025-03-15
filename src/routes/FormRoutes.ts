@@ -66,6 +66,13 @@ export function useFormRouting() {
   const location = useLocation();
   const currentPath = location.pathname.slice(1) || FormRouteEnum.START;
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   const navigateToRoute = (route: FormRoute) => {
     // Update page title
     const pageTitle = PAGE_TITLES[route];
@@ -74,7 +81,11 @@ export function useFormRouting() {
     // Track step progression in GTM
     gtm.trackStepProgress(route);
 
+    // Navigate to the new route
     navigate(`/${route}`);
+
+    // Scroll to top after navigation
+    scrollToTop();
   };
 
   return {

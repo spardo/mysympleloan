@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw, AlertTriangle, MessageCircle } from 'lucide-react';
 import { FormRouteEnum, useFormRouting } from '../../routes/FormRoutes';
 import type { FormData } from '../../types/form';
 import Title from '../ui/Title';
@@ -131,8 +131,18 @@ export default function PhoneVerificationForm({
     <>
       <form id="new-form-sms" onSubmit={handleSubmit} className="space-y-6">
         <div className="text-center">
-          <Title as="h2" className="mb-2">Check Your Phone</Title>
-          <Description size="lg">Enter the 6-digit code below</Description>
+          <div className="flex flex-col items-center mb-6">
+            <div className="relative">
+              {/* Outer pulsing circle */}
+              <div className="absolute inset-0 rounded-full bg-[#212d52]/10 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
+              {/* Inner container with icon */}
+              <div className="relative w-16 h-16 rounded-full bg-[#212d52]/10 flex items-center justify-center animate-[bounce_2s_ease-in-out_infinite]">
+                <MessageCircle className="w-8 h-8 text-[#212d52]" />
+              </div>
+            </div>
+          </div>
+          <Title as="h2" className="mb-2">Check Your Text Messages</Title>
+          <Description size="lg">Enter the 6-digit code before it expires</Description>
         </div>
   
         <div>
